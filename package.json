@@ -1,12 +1,14 @@
 {
   "name": "lib2cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "columnify": "^1.5.4",
     "minimist": "^1.2.0"
   },
   "devDependencies": {
+    "prettier-standard": "^8.0.1",
     "standard": "^11.0.1"
   },
   "scripts": {
