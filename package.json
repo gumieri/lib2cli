@@ -1,0 +1,31 @@
+{
+  "name": "lib2cli",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "minimist": "^1.2.0"
+  },
+  "devDependencies": {
+    "standard": "^11.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gumieri/lib2cli.git"
+  },
+  "keywords": [
+    "cli",
+    "node",
+    "nodejs",
+    "lib"
+  ],
+  "author": "Rafael Gumieri",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gumieri/lib2cli/issues"
+  },
+  "homepage": "https://github.com/gumieri/lib2cli#readme"
+}
