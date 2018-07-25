@@ -1,59 +1,71 @@
 const minimist = require('minimist')
 const path = require('path')
 
-let { argv } = process
+const help = require('./help')
 
-const executorPath = path.parse(argv.shift())
-const applicationPath = path.parse(argv.shift())
-
-const flags = minimist(argv)
-const commands = flags._
-delete flags._
-usedCommands = []
-
-const walk = property => {
-  if (commands.length === 0 || typeof property !== 'object') return property
-
-  const usedCommand = commands.shift()
-  usedCommands.push(usedCommand)
-  return walk(property[usedCommand])
-}
-
-const help = (property, err) => {
-  if (err) console.log(err.message)
-  console.log()
-
-  const commandPath = [applicationPath.name].concat(usedCommands).join(' ')
-
-  console.log(`usage: ${commandPath} <command> [<args>]`)
-  console.log()
-
-  switch (typeof property) {
-    case 'function':
-      break
-    case 'object':
-      console.log('possible values:')
-      Object.keys(property).forEach(key => console.log(`\t${key}`))
-      break
+function walkLib ({ lib, parameters, pastParameters = [] }) {
+  if (parameters.length === 0 || typeof lib !== 'object') {
+    return {
+      command: lib,
+      parameters,
+      pastParameters
+    }
   }
+
+  const nextCommand = parameters.shift()
+
+  pastParameters.push(nextCommand)
+
+  return walkLib({
+    lib: lib[nextCommand],
+    parameters,
+    pastParameters
+  })
 }
 
-const execute = property => {
-  switch (typeof property) {
+function execute ({ command, parameters, pastParameters, flags, paths, doc }) {
+  switch (typeof command) {
     case 'function':
-      return property(...commands, flags).catch(err => {
-        help(property, err)
+      return command(...parameters, flags).catch(err => {
+        help({ command, pastParameters, paths, doc, err })
         process.exit(1)
       })
 
     case 'object':
-      help(property)
+      help({ command, pastParameters, paths, doc })
       process.exit(1)
   }
 }
 
+function parseArgs (args) {
+  const paths = {
+    executor: path.parse(args.shift()),
+    application: path.parse(args.shift())
+  }
+
+  let flags = minimist(args)
+  const parameters = flags._
+  delete flags._
+
+  return { parameters, flags, paths }
+}
+
+function run ({ args, lib, doc }) {
+  if (args === undefined) args = process.argv
+
+  const { parameters: initialParameters, flags, paths } = parseArgs(args)
+
+  const { command, parameters, pastParameters } = walkLib({
+    parameters: initialParameters,
+    lib
+  })
+
+  return execute({ command, parameters, pastParameters, flags, paths, doc })
+}
+
 module.exports = {
-  walk,
+  run,
   help,
+  walkLib,
   execute
 }
