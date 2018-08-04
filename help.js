@@ -1,5 +1,11 @@
 const columnify = require('columnify')
 
+const columnsConfig = {
+  columnSplitter: '\t',
+  minWidth: 12,
+  showHeaders: false
+}
+
 function walkDoc ({ doc, pastParameters }) {
   const f = (foundDoc, parameter) => {
     if (!foundDoc.hasOwnProperty('commands')) return {}
@@ -8,6 +14,39 @@ function walkDoc ({ doc, pastParameters }) {
   }
 
   return pastParameters.reduce(f, doc)
+}
+
+function printParameters ({ commandDoc }) {
+  let parametersDoc = {}
+  Object.keys(commandDoc.parameters).forEach((parameter, i) => {
+    parametersDoc[`${i + 1}. ${parameter}`] =
+      commandDoc.parameters[parameter].description
+  })
+
+  const parametersHelp = columnify(parametersDoc, columnsConfig)
+  console.log(`parameters:\n${parametersHelp}\n`)
+}
+
+function printFlags ({ commandDoc }) {
+  let parametersDoc = {}
+  Object.keys(commandDoc.flags).forEach((flag, i) => {
+    parametersDoc[`--${flag}`] = commandDoc.flags[flag].description
+  })
+
+  const flagsHelp = columnify(parametersDoc, columnsConfig)
+  console.log(`flags:\n${flagsHelp}\n`)
+}
+
+function printHelp ({ commandDoc }) {
+  if (commandDoc === undefined) return undefined
+
+  if (commandDoc.hasOwnProperty('parameters')) {
+    printParameters({ commandDoc })
+  }
+
+  if (commandDoc.hasOwnProperty('flags')) {
+    printFlags({ commandDoc })
+  }
 }
 
 module.exports = ({ command, pastParameters, paths, doc, err }) => {
@@ -25,44 +64,7 @@ module.exports = ({ command, pastParameters, paths, doc, err }) => {
 
   switch (typeof command) {
     case 'function':
-      if (commandDoc !== undefined) {
-        if (commandDoc.hasOwnProperty('parameters')) {
-          let parametersDoc = {}
-
-          Object.keys(commandDoc.parameters).forEach((parameter, i) => {
-            parametersDoc[`${i + 1}. ${parameter}`] =
-              commandDoc.parameters[parameter].description
-          })
-
-          console.log('parameters:')
-          console.log(
-            columnify(parametersDoc, {
-              columnSplitter: '\t',
-              minWidth: 12,
-              showHeaders: false
-            })
-          )
-          console.log('\n')
-        }
-
-        if (commandDoc.hasOwnProperty('flags')) {
-          let parametersDoc = {}
-
-          Object.keys(commandDoc.flags).forEach((flag, i) => {
-            parametersDoc[`--${flag}`] = commandDoc.flags[flag].description
-          })
-
-          console.log('flags:')
-          console.log(
-            columnify(parametersDoc, {
-              columnSplitter: '\t',
-              minWidth: 12,
-              showHeaders: false
-            })
-          )
-          console.log('\n')
-        }
-      }
+      printHelp({ commandDoc })
       break
 
     case 'object':

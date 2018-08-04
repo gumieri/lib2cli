@@ -26,7 +26,7 @@ function walkLib ({ lib, parameters, pastParameters = [] }) {
 function execute ({ command, parameters, pastParameters, flags, paths, doc }) {
   switch (typeof command) {
     case 'function':
-      return command(...parameters, flags).catch(err => {
+      command(...parameters, flags).catch(err => {
         help({ command, pastParameters, paths, doc, err })
         process.exit(1)
       })
