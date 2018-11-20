@@ -47,6 +47,11 @@ function parseArgs (args) {
   const parameters = flags._
   delete flags._
 
+  for (key of Object.keys(flags)) {
+    const cammelKey = key.replace(/\W+(.)/g, (_, c) => c.toUpperCase())
+    flags[cammelKey] = flags[key]
+  }
+
   return { parameters, flags, paths }
 }
 
