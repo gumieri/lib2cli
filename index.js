@@ -23,17 +23,31 @@ function walkLib ({ lib, parameters, pastParameters = [] }) {
   })
 }
 
-function execute ({ command, parameters, pastParameters, flags, paths, doc }) {
-  switch (typeof command) {
-    case 'object':
-      help({ command, pastParameters, paths, doc })
-      process.exit(1)
+async function execute ({
+  command,
+  parameters,
+  pastParameters,
+  flags,
+  paths,
+  doc
+}) {
+  try {
+    switch (typeof command) {
+      case 'object':
+        help({ command, pastParameters, paths, doc })
+        break
 
-    case 'function':
-      command(...parameters, flags).catch(err => {
-        help({ command, pastParameters, paths, doc, err })
+      case 'function':
+        await command(...parameters, flags)
+        break
+
+      case 'undefined':
         process.exit(1)
-      })
+        break
+    }
+  } catch (err) {
+    help({ command, pastParameters, paths, doc, err })
+    process.exit(1)
   }
 }
 
