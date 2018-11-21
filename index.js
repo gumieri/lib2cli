@@ -13,14 +13,19 @@ function walkLib ({ lib, parameters, pastParameters = [] }) {
   }
 
   const nextCommand = parameters.shift()
+  const nextLib = lib[nextCommand]
+
+  if (typeof nextLib === 'undefined') {
+    return {
+      command: lib,
+      parameters,
+      pastParameters
+    }
+  }
 
   pastParameters.push(nextCommand)
 
-  return walkLib({
-    lib: lib[nextCommand],
-    parameters,
-    pastParameters
-  })
+  return walkLib({ lib: nextLib, parameters, pastParameters })
 }
 
 async function execute ({
