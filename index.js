@@ -1,31 +1,38 @@
 const minimist = require('minimist')
 const path = require('path')
 
-const help = require('./help')
+const printHelp = require('./help')
 
-function walkLib ({ lib, parameters, pastParameters = [] }) {
+function walkLib ({ lib, parameters, pastParameters = [], help = false }) {
   if (parameters.length === 0 || typeof lib !== 'object') {
     return {
       command: lib,
       parameters,
-      pastParameters
+      pastParameters,
+      help
     }
   }
 
-  const nextCommand = parameters.shift()
-  const nextLib = lib[nextCommand]
+  let nextCommand = parameters.shift()
+  if (nextCommand === 'help') {
+    nextCommand = parameters.shift()
+    help = true
+  }
 
-  if (typeof nextLib === 'undefined') {
+  const next = lib[nextCommand]
+
+  if (typeof next === 'undefined') {
     return {
       command: lib,
       parameters,
-      pastParameters
+      pastParameters,
+      help
     }
   }
 
   pastParameters.push(nextCommand)
 
-  return walkLib({ lib: nextLib, parameters, pastParameters })
+  return walkLib({ lib: next, parameters, pastParameters, help })
 }
 
 async function execute ({
@@ -39,19 +46,16 @@ async function execute ({
   try {
     switch (typeof command) {
       case 'object':
-        help({ command, pastParameters, paths, doc })
+        printHelp({ command, pastParameters, paths, doc })
+        process.exit(1)
         break
 
       case 'function':
         await command(...parameters, flags)
         break
-
-      case 'undefined':
-        process.exit(1)
-        break
     }
   } catch (err) {
-    help({ command, pastParameters, paths, doc, err })
+    printHelp({ command, pastParameters, paths, doc, err })
     process.exit(1)
   }
 }
@@ -79,17 +83,22 @@ function run ({ args, lib, doc }) {
 
   const { parameters: initialParameters, flags, paths } = parseArgs(args)
 
-  const { command, parameters, pastParameters } = walkLib({
+  const { command, parameters, pastParameters, help } = walkLib({
     parameters: initialParameters,
     lib
   })
+
+  if (flags.help || help) {
+    printHelp({ command, pastParameters, paths, doc })
+    return
+  }
 
   return execute({ command, parameters, pastParameters, flags, paths, doc })
 }
 
 module.exports = {
   run,
-  help,
+  help: printHelp,
   walkLib,
   execute
 }
