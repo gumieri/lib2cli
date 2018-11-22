@@ -3,10 +3,19 @@ const path = require('path')
 
 const printHelp = require('./help')
 
-function walkLib ({ lib, parameters, pastParameters = [], help = false }) {
-  if (parameters.length === 0 || typeof lib !== 'object') {
+function walk ({ project, parameters, pastParameters = [], help = false }) {
+  if (project.hasOwnProperty('command')) {
     return {
-      command: lib,
+      command: project.command,
+      parameters,
+      pastParameters,
+      help
+    }
+  }
+
+  if (parameters.length === 0 || typeof project !== 'object') {
+    return {
+      command: project,
       parameters,
       pastParameters,
       help
@@ -19,11 +28,11 @@ function walkLib ({ lib, parameters, pastParameters = [], help = false }) {
     help = true
   }
 
-  const next = lib[nextCommand]
+  const next = project[nextCommand]
 
   if (typeof next === 'undefined') {
     return {
-      command: lib,
+      command: project,
       parameters,
       pastParameters,
       help
@@ -32,7 +41,7 @@ function walkLib ({ lib, parameters, pastParameters = [], help = false }) {
 
   pastParameters.push(nextCommand)
 
-  return walkLib({ lib: next, parameters, pastParameters, help })
+  return walk({ project: next, parameters, pastParameters, help })
 }
 
 async function execute ({
@@ -78,14 +87,21 @@ function parseArgs (args) {
   return { parameters, flags, paths }
 }
 
-function run ({ args, lib, doc }) {
-  if (args === undefined) args = process.argv
+function run (params) {
+  if (params.args === undefined) params.args = process.argv
 
-  const { parameters: initialParameters, flags, paths } = parseArgs(args)
+  const { parameters: initialParameters, flags, paths } = parseArgs(params.args)
 
-  const { command, parameters, pastParameters, help } = walkLib({
+  let doc = params
+  let project = params.commands
+  if (params.hasOwnProperty('lib') && params.hasOwnProperty('doc')) {
+    doc = params.doc
+    project = params.lib
+  }
+
+  const { command, parameters, pastParameters, help } = walk({
     parameters: initialParameters,
-    lib
+    project
   })
 
   if (flags.help || help) {
@@ -98,7 +114,7 @@ function run ({ args, lib, doc }) {
 
 module.exports = {
   run,
+  walk,
   help: printHelp,
-  walkLib,
   execute
 }
