@@ -2,7 +2,6 @@ const columnify = require('columnify')
 
 const columnsConfig = {
   columnSplitter: '\t',
-  minWidth: 12,
   showHeaders: false
 }
 
@@ -27,13 +26,30 @@ function printParameters ({ commandDoc }) {
   console.log(`parameters:\n${parametersHelp}\n`)
 }
 
-function printFlags ({ commandDoc }) {
-  let parametersDoc = {}
-  Object.keys(commandDoc.flags).forEach((flag, i) => {
-    parametersDoc[`--${flag}`] = commandDoc.flags[flag].description
-  })
+function printFlags ({ commandDoc: { flags } }) {
+  let flagsDoc = []
+  for (flag of Object.keys(flags)) {
+    let { description, alias, required, defaultValue } = flags[flag]
+    if (alias) {
+      alias = `-${alias}`
+    }
 
-  const flagsHelp = columnify(parametersDoc, columnsConfig)
+    let requiredMessage
+    if (required) {
+      requiredMessage = 'REQUIRED'
+    } else if (defaultValue) {
+      requiredMessage = `Default: "${defaultValue}"`
+    }
+
+    flagsDoc.push({
+      complete: `--${flag}`,
+      alias,
+      description,
+      required: requiredMessage
+    })
+  }
+
+  const flagsHelp = columnify(flagsDoc, columnsConfig)
   console.log(`flags:\n${flagsHelp}\n`)
 }
 
