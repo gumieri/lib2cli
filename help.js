@@ -7,8 +7,7 @@ const columnsConfig = {
 
 function walkDoc ({ doc, pastParameters }) {
   const f = (foundDoc, parameter) => {
-    if (!foundDoc.hasOwnProperty('commands')) return {}
-
+    if (!foundDoc.hasOwnProperty('commands')) return foundDoc[parameter]
     return foundDoc.commands[parameter]
   }
 
@@ -85,7 +84,9 @@ module.exports = ({ command, pastParameters, paths, doc, err }) => {
 
     case 'object':
       console.log('possible commands:')
-      Object.keys(command).forEach(key => console.log(`\t${key}`))
+      Object.keys(command)
+        .filter(k => !['description'].includes(k))
+        .forEach(k => console.log(`\t${k}`))
       break
   }
 }
