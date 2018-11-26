@@ -29,7 +29,7 @@ const lib2cli = require('lib2cli')
 
 lib2cli.run({
   lib: {
-    'be-awesome': ({ awesomeFlag }, param1, param2) => {
+    'be-awesome': (param1, param2, { awesomeFlag }) => {
       console.log(`I'm awesome! ${param1}, ${param2}, ${awesomeFlag}`)
     }
   }
@@ -68,7 +68,7 @@ lib2cli.run({
   description: 'My awesome CLI!',
   commands: {
     'be-awesome': {
-      command: ({ awesomeFlag }, param1, param2) => {
+      command: (param1, param2, { awesomeFlag }) => {
         console.log(`I'm awesome! ${param1}, ${param2}, ${awesomeFlag}`)
       },
       description: 'To be awesome.',
@@ -89,6 +89,31 @@ lib2cli.run({
   }
 })
 ```
+
+### Args: Flags & Parameters
+
+The objective of the `lib2cli` project is to have as little as possible of changes to the interface of the original lib to its CLI version.
+
+Considering that, the CLI parameters are the same as the function parameters, preserving the sequence.
+```bash
+mycli be-awesome something 'another thing'
+```
+Will be translated to:
+```javascript
+beAwesome('something', 'something')
+```
+
+And flags, which are "named parameters", will be sent as a last object parameter with the flag name as the property of the object.
+```bash
+mycli be-awesome something --awesome-flag 'flag value'
+```
+Will be translated to:
+```javascript
+beAwesome('something', { awesomeFlag: 'flag value' })
+```
+The flag name will be converted to cammelCase.
+
+The args are parsed by the [minimist](https://github.com/substack/minimist).
 
 ### Documentation
 
