@@ -18,7 +18,7 @@ const myDoc = require('./doc_of_my_lib.json')
 lib2cli.run({ lib: myLib, doc: myDoc })
 ```
 
-There's two ways of organizing the information for creating the CLI.
+There are two ways of organizing the information for creating the CLI.
 
 One is informing the `lib` as an object or the function itself and also informing the `doc` as an object describing all commands, parameters and flags to create the help text.
 
@@ -114,6 +114,11 @@ beAwesome('something', { awesomeFlag: 'flag value' })
 The flag name will be converted to cammelCase.
 
 The args are parsed by the [minimist](https://github.com/substack/minimist).
+
+It's also possible to handle yourself the args and pass it to the `lib2cli` with the property `args`:
+```
+lib2cli.run({ args: process.argv, ... })
+```
 
 ### Documentation
 
