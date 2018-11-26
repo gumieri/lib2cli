@@ -142,5 +142,6 @@ module.exports = {
   run,
   walk,
   help: printHelp,
+  parseArgs,
   execute
 }
