@@ -2,6 +2,52 @@ import test from 'ava'
 import lib2cli from '.'
 import Settings from './settings'
 
+test('run', async t => {
+  const args = ['path/to/nodejs', 'path/to/bin/cli', 'first-command']
+
+  const program = {
+    description: 'program description',
+    commands: {
+      'first-command': {
+        description: 'first command description',
+        command: () => 'first command output'
+      }
+    }
+  }
+
+  const running = lib2cli.run({ args, ...program })
+  await t.notThrowsAsync(running)
+})
+
+test('run lib', async t => {
+  const args = ['path/to/nodejs', 'path/to/bin/cli', 'first-command']
+
+  const program = {
+    lib: {
+      description: 'program description',
+      'first-command': {
+        description: 'first command description',
+        command: () => 'first command output'
+      }
+    }
+  }
+
+  const running = lib2cli.run({ args, ...program })
+  await t.notThrowsAsync(running)
+})
+
+test('run command directly', async t => {
+  const args = ['path/to/nodejs', 'path/to/bin/cli', 'param']
+
+  const program = {
+    description: 'single command description',
+    command: () => 'first command output'
+  }
+
+  const running = lib2cli.run({ args, ...program })
+  await t.notThrowsAsync(running)
+})
+
 test('parseArgs', async t => {
   const args = ['path/to/nodejs', 'path/to/bin/cli', '--flag', 'value', 'param']
 

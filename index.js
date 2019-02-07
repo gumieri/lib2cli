@@ -104,14 +104,20 @@ function run (params) {
 
   const args = params[words.args] ? params[words.args] : process.argv
 
-  let project = params[words.commands]
+  let project
   if (params.hasOwnProperty(words.lib)) {
     project = params[words.lib]
+  } else if (typeof params[words.command] === 'function') {
+    project = params[words.command]
+  } else {
+    project = params[words.commands]
   }
 
-  let doc = params
+  let doc
   if (params.hasOwnProperty(words.doc)) {
     doc = params[words.doc]
+  } else {
+    doc = params
   }
 
   const { parameters: initialParameters, flags, paths } = parseArgs(args)
