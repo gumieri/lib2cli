@@ -13,7 +13,7 @@ function walk ({
 }) {
   const { helpCommand, words } = settings
 
-  if (project.hasOwnProperty('command')) {
+  if (project.hasOwnProperty(words.command)) {
     return {
       command: project[words.command],
       parameters,

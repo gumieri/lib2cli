@@ -1,6 +1,6 @@
 import test from 'ava'
 import lib2cli from '.'
-import settings from './settings'
+import Settings from './settings'
 
 test('parseArgs', async t => {
   const args = ['path/to/nodejs', 'path/to/bin/cli', '--flag', 'value', 'param']
@@ -32,7 +32,11 @@ test('parseArgs', async t => {
 })
 
 test('walk - empty parameters', async t => {
-  const result = lib2cli.walk({ project: {}, parameters: [], settings: {} })
+  const result = lib2cli.walk({
+    project: {},
+    parameters: [],
+    settings: Settings.load({})
+  })
 
   const expected = {
     command: {},
@@ -50,7 +54,7 @@ test('walk - help command', async t => {
   const result = lib2cli.walk({
     project,
     parameters,
-    settings: { helpCommand: true }
+    settings: Settings.load({ helpCommand: true })
   })
 
   const expected = {
@@ -69,7 +73,7 @@ test('walk - help command disabled', async t => {
   const result = lib2cli.walk({
     project,
     parameters,
-    settings: { helpCommand: false }
+    settings: Settings.load({ helpCommand: false })
   })
 
   const expected = {
