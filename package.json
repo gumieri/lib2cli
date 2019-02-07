@@ -8,7 +8,7 @@
     "minimist": "^1.2.0"
   },
   "devDependencies": {
-    "ava": "^0.25.0",
+    "ava": "^1.2.1",
     "prettier-standard": "^8.0.1",
     "standard": "^11.0.1"
   },
