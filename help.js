@@ -26,7 +26,7 @@ function printParameters ({ commandDoc, settings }) {
   })
 
   const parametersHelp = columnify(parametersDoc, columnsConfig)
-  console.log(`parameters:\n${parametersHelp}\n`)
+  settings.console.error(`parameters:\n${parametersHelp}\n`)
 }
 
 function printFlags ({ commandDoc, settings }) {
@@ -60,7 +60,7 @@ function printFlags ({ commandDoc, settings }) {
   }
 
   const flagsHelp = columnify(flagsDoc, columnsConfig)
-  console.log(`flags:\n${flagsHelp}\n`)
+  settings.console.error(`flags:\n${flagsHelp}\n`)
 }
 
 function printHelp ({ commandDoc, settings }) {
@@ -80,11 +80,11 @@ function printHelp ({ commandDoc, settings }) {
 module.exports = ({ command, pastParameters, paths, doc, settings, err }) => {
   const { words } = settings
 
-  if (err) console.log(`${err.message}\n`)
+  if (err) settings.console.error(`${err.message}\n`)
 
   const commandPath = [paths.application.name].concat(pastParameters).join(' ')
 
-  console.log(`usage: ${commandPath} <command> [<args>]\n`)
+  settings.console.error(`usage: ${commandPath} <command> [<args>]\n`)
 
   const commandDoc = walk({ doc, pastParameters, settings })
 
@@ -92,7 +92,7 @@ module.exports = ({ command, pastParameters, paths, doc, settings, err }) => {
     commandDoc !== undefined &&
     commandDoc.hasOwnProperty(words.description)
   ) {
-    console.log(`${commandDoc.description}\n`)
+    settings.console.error(`${commandDoc.description}\n`)
   }
 
   switch (typeof command) {
@@ -101,10 +101,10 @@ module.exports = ({ command, pastParameters, paths, doc, settings, err }) => {
       break
 
     case 'object':
-      console.log('possible commands:')
+      settings.console.error('possible commands:')
       Object.keys(command)
         .filter(k => k !== words.description)
-        .forEach(k => console.log(`\t${k}`))
+        .forEach(k => settings.console.error(`\t${k}`))
       break
   }
 }

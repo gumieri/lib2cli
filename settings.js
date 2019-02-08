@@ -1,8 +1,11 @@
+const { Console } = require('console')
+
 function load (values) {
   return Object.assign(
     {
       helpFlag: true,
       helpCommand: true,
+      console: new Console({ stdout: process.stdout, stderr: process.stderr }),
       words: {
         args: 'args',
         alias: 'alias',

@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "ava": "^1.2.1",
+    "get-stream": "^4.1.0",
     "prettier-standard": "^8.0.1",
     "standard": "^11.0.1"
   },
